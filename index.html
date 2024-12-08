@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Throne Tournament</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Dice Throne Tournament</h1>
+    <div id="setup">
+        <input type="text" id="player-name" placeholder="Enter Player Name">
+        <button id="add-player">Add Player</button>
+        <button id="randomize">Generate Tournament</button>
+        <button id="generate_next">Generate next phase</button>
+    </div>
+    <div id="players-list">
+        <h2>Players</h2>
+        <ul id="players"></ul>
+    </div>
+    <div id="tabs">
+        <button class="tab-button" onclick="showTab('pools')">Matches</button>
+        <button class="tab-button" onclick="showTab('leaderboard')">Leaderboard</button>
+    </div>
+    <div id="content">
+        <div id="pools" class="tab-content">
+            <h2>Tournament Bracket</h2>
+            <div id="bracket"></div>
+        </div>
+        <div id="leaderboard" class="tab-content">
+            <h2>Score Table</h2>
+            <!-- Score table will be dynamically added here -->
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+
+</html>
