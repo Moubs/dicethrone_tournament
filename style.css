@@ -129,3 +129,40 @@ body::-webkit-scrollbar-thumb {
     background: #e67e22; /* Orange scrollbar */
     border-radius: 5px;
 }
+
+/* Character Sidebar */
+#character-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 200px;
+    height: 100%;
+    background-color: #2c3e50; /* Dark blue-gray */
+    color: #f5f5f5; /* Light text */
+    overflow-y: auto;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+}
+
+#character-sidebar h2 {
+    color: #e67e22; /* Vibrant orange for headers */
+    margin-bottom: 20px;
+}
+
+#character-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#character-sidebar li {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #34495e; /* Darker blue-gray */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#character-sidebar li:hover {
+    background-color: #3b5998; /* Slightly brighter blue-gray on hover */
+}

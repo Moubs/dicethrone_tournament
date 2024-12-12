@@ -1,5 +1,7 @@
-const players = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18];
+const players = [];
 const characters = ["Barbarian", "Moon Elf", "Shadow Thief", "Pyromancer", "Paladin", "Monk", "treant", "ninja", "seraphine", "vampire lord", "guns slinger", "samurai", "santa", "krampus","artificier","pirate","guns slinger", "samurai", "santa", "krampus"];
+let avail_characters = characters.slice();
+let matches = [];
 
 document.getElementById("add-player").addEventListener("click", () => {
     const playerName = document.getElementById("player-name").value.trim();
@@ -20,10 +22,8 @@ document.getElementById("randomize").addEventListener("click", () => {
         return;
     }
 
-    const shuffledCharacters = [...characters].sort(() => Math.random() - 0.5);
     const randomized = players.map((player, index) => ({
         name: player,
-        character: shuffledCharacters[index], // Assign unique character
         points: 0, // Initialize points
     }));
 
@@ -98,22 +98,33 @@ function displayTournament(data) {
             const matchDiv = document.createElement("div");
             matchDiv.id = `match-${matchId}`;
             matchDiv.innerHTML = `
-                <p>${match.player1.name} (${match.player1.character}) vs 
-                ${match.player2.name} (${match.player2.character})</p>
-                <button onclick="recordResult(${poolIndex}, ${match.player1Index}, ${match.player2Index}, 'win', '${matchId}')">Player 1 Wins</button>
-                <button onclick="recordResult(${poolIndex}, ${match.player2Index}, ${match.player1Index}, 'win', '${matchId}')">Player 2 Wins</button>
-                <button onclick="recordResult(${poolIndex}, ${match.player1Index}, ${match.player2Index}, 'draw', '${matchId}')">Draw</button>
+                <p>${match.player1.name} vs 
+                ${match.player2.name}</p> <button onclick="startMatch(${poolIndex},'${match.player1.name}', '${match.player2.name}', '${matchId}')">Start Match</button>
+                <button disabled  onclick="recordResult(${poolIndex}, ${match.player1Index}, ${match.player2Index}, 'win', '${matchId}')">Player 1 Wins</button>
+                <button disabled  onclick="recordResult(${poolIndex}, ${match.player2Index}, ${match.player1Index}, 'win', '${matchId}')">Player 2 Wins</button>
+                <button disabled  onclick="recordResult(${poolIndex}, ${match.player1Index}, ${match.player2Index}, 'draw', '${matchId}')">Draw</button>
             `;
             poolDiv.appendChild(matchDiv);
         });
 
         bracket.appendChild(poolDiv);
     });
+    displayCharacterList();
 
     displayLeaderboard(); // Initialize score table
 }
 
 
+function displayCharacterList(){
+    const character_list = document.getElementById("characters-list");
+    character_list.innerHTML = '';
+    avail_characters.forEach((character, index) => {
+        const characterDiv = document.createElement("il");
+        characterDiv.innerHTML = `<p>${character}</p>`;
+        character_list.appendChild(characterDiv);
+    }
+    );
+}
 
 
 function createMatches(pool) {
@@ -132,9 +143,48 @@ function createMatches(pool) {
 }
 
 
+function startMatch(poolIndex, player1, player2, matchIndex) {
+    if(avail_characters.length < 2){
+        alert("Not enough characters for all players. Wait for matches to finish or add more characters!");
+        return;
+    }
+    if(matches.find(m => m.player1 === player1 || m.player1 === player2 || m.player2 === player1 || m.player2 === player2)){
+        alert("This match is already in progress!");
+        return;
+    }
+    if (matches.find(m => m.player1 === player1 || m.player2 === player1)){
+        alert("This player is already in a match!");
+        return;
+    }
+    let randomIndex = Math.floor(Math.random() * avail_characters.length);
+    const character1 = avail_characters[randomIndex];
+    avail_characters.splice(randomIndex, 1);
+    randomIndex = Math.floor(Math.random() * avail_characters.length);
+    const character2 = avail_characters[randomIndex];
+    avail_characters.splice(randomIndex, 1);
+    const matchElement = document.getElementById(`match-${matchIndex}`);
+    matchElement.querySelectorAll("button").forEach(button => {
+        button.disabled = false;
+    });
+    matchElement.querySelector("button").disabled = true;
+
+    matchElement.querySelector("p").textContent = `${player1} (${character1}) vs ${player2} (${character2})`;
+    matches.push({player1: player1, player2: player2, character1: character1, character2: character2});
+    displayCharacterList();
+}
+
 function recordResult(poolIndex, winnerIndex, loserIndex, result, matchId) {
     const pool = pools[poolIndex];
     const matchElement = document.getElementById(`match-${matchId}`);
+
+    const match = matches.find(m => m.player1 === pool[winnerIndex].name || m.player1 === pool[loserIndex].name);
+    if (match) {
+        avail_characters.push(match.character1, match.character2);
+        matches = matches.filter(m => m !== match);
+    }
+    else{
+        alert("Match not found!");
+    }
 
     if (result === 'win') {
         pool[winnerIndex].points += 2;
@@ -151,6 +201,7 @@ function recordResult(poolIndex, winnerIndex, loserIndex, result, matchId) {
 
     // Update leaderboard
     displayLeaderboard();
+    displayCharacterList();
 }
 
 
@@ -172,7 +223,6 @@ function displayLeaderboard() {
         const headerRow = document.createElement("tr");
         headerRow.innerHTML = `
             <th>Player</th>
-            <th>Character</th>
             <th>Points</th>
         `;
         table.appendChild(headerRow);
@@ -181,7 +231,6 @@ function displayLeaderboard() {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${player.name}</td>
-                <td>${player.character}</td>
                 <td><input type="number" value="${player.points}" onchange=changePlayerScore(${poolIndex},${index},this.value)></td>
             `;
             table.appendChild(row);
